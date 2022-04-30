@@ -4,7 +4,7 @@ import { List, Button, Notification, ListItem, ContactListStyles } from "./Conta
 
 const ContactList = ({ contacts, filteredContacts, deleteContact }) => {
   return (
-    <ContactListStyles>
+    <ContactListStyles >
       {contacts.length === 0 ? (
         <Notification>No contacts added yet</Notification>
       ) : (
@@ -31,7 +31,14 @@ const ContactList = ({ contacts, filteredContacts, deleteContact }) => {
 
 
 ContactList.propTypes = {
-  contacts: PropTypes.array.isRequired,
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      phone: PropTypes.string.isRequired,
+    })
+  ),
+  filteredContacts: PropTypes.string.isRequired,
   deleteContact: PropTypes.func.isRequired,
 };
 

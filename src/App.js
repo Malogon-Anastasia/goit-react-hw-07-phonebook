@@ -6,20 +6,25 @@ import { nanoid } from "nanoid";
 import toast, { Toaster } from "react-hot-toast";
 import Filter from "./Components/Filter";
 import { useSelector, useDispatch } from "react-redux";
-import { addContact, deleteContact } from "./redux/sliceContacts";
+// import { addContact, deleteContact } from "./redux/sliceContacts";
 import { changeFilter } from "./redux/sliceFilter";
+import { useFetchContactsQuery, useCreateContactMutation, useRemoveContactMutation } from "./redux/sliceContacts";
 
 export const App = () => {
-  const contacts = useSelector((state) => state.contacts.items);
-  const filter = useSelector((state) => state.contacts.filter);
+  const contacts = useSelector((state) => state.items);
+  const filter = useSelector((state) => state.filter);
   const dispatch = useDispatch();
+  const { data } = useFetchContactsQuery();
+  const [createContact] = useCreateContactMutation();
+  const [onRemoveContact] = useRemoveContactMutation();
+  
 
   const onHandleSubmit = (event) => {
     event.preventDefault();
     const form = event.target;
     const contactName = event.target.elements.name.value;
     const contactPhone = event.target.elements.number.value;
-    const isNameInContacts = contacts.find(
+    const isNameInContacts = data.find(
       (element) => element.name === contactName
     );
 
@@ -36,8 +41,8 @@ export const App = () => {
       name: contactName,
       number: contactPhone,
     };
-
-    dispatch(addContact(newContact));
+    createContact(newContact);
+    // dispatch(addContact(newContact));
     form.reset();
   };
 
@@ -60,12 +65,14 @@ export const App = () => {
 
     return filteredContacts;
   }
+
+
   const contactId = nanoid();
   const numberId = nanoid();
 
-  const deletedContact = (id) => {
-    dispatch(deleteContact(id));
-  };
+  // const deletedContact = (id) => {
+  //   dispatch(deleteContact(id));
+  // };
   return (
     <>
       <Section title="Phonebook">
@@ -79,9 +86,9 @@ export const App = () => {
       <Section title="Contacts">
         <Filter onSearchInput={onSearchInput} value={filter} />
         <ContactList
-          contacts={contacts}
+          contacts={data}
           filteredContacts={filteredContacts}
-          deleteContact={deletedContact}
+          deleteContact={onRemoveContact}
         />
       </Section>
       <Toaster />
