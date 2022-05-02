@@ -3,7 +3,9 @@ import Section from "./Components/Section";
 import ContactForm from "./Components/ContactForm";
 import ContactList from "./Components/ContactList";
 import { nanoid } from "nanoid";
-import toast, { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Filter from "./Components/Filter";
 import { useSelector, useDispatch } from "react-redux";
 // import { addContact, deleteContact } from "./redux/sliceContacts";
@@ -11,10 +13,10 @@ import { changeFilter } from "./redux/sliceFilter";
 import { useFetchContactsQuery, useCreateContactMutation, useRemoveContactMutation } from "./redux/sliceContacts";
 
 export const App = () => {
-  const contacts = useSelector((state) => state.items);
+  // const contacts = useSelector((state) => state.items);
   const filter = useSelector((state) => state.filter);
   const dispatch = useDispatch();
-  const { data } = useFetchContactsQuery();
+  const { data = [] } = useFetchContactsQuery();
   const [createContact] = useCreateContactMutation();
   const [onRemoveContact] = useRemoveContactMutation();
   
@@ -37,12 +39,12 @@ export const App = () => {
     }
 
     const newContact = {
-      id: nanoid(),
       name: contactName,
-      number: contactPhone,
+      phone: contactPhone,
     };
     createContact(newContact);
-    // dispatch(addContact(newContact));
+    const notify = () => toast.success(`${contactName} has succesfully added to the phonebook`);
+    notify();
     form.reset();
   };
 
@@ -51,21 +53,6 @@ export const App = () => {
 
     dispatch(changeFilter(inputValue));
   };
-
-  const filteredContacts = getFilteredContacts();
-  function getFilteredContacts() {
-    const normalizedFilter = filter.toLowerCase();
-    const flatContacts = contacts.flat(Infinity);
-
-    const filteredContacts = flatContacts.filter(
-      (contact) =>
-        contact.name.toLowerCase().includes(normalizedFilter) ||
-        contact.number.includes(normalizedFilter)
-    );
-
-    return filteredContacts;
-  }
-
 
   const contactId = nanoid();
   const numberId = nanoid();
@@ -87,11 +74,11 @@ export const App = () => {
         <Filter onSearchInput={onSearchInput} value={filter} />
         <ContactList
           contacts={data}
-          filteredContacts={filteredContacts}
+          filter={filter}
           deleteContact={onRemoveContact}
         />
       </Section>
-      <Toaster />
+      <ToastContainer />
     </>
   );
 };

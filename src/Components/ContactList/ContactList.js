@@ -1,28 +1,47 @@
+import React from "react";
 import PropTypes from "prop-types";
-// npimport ContactItem from "../ContactItem";
-import { List, Button, Notification, ListItem, ContactListStyles } from "./ContactList.styled";
+import ContactItem from "../ContactItem";
+import { List, Button, Notification, ContactListStyles } from "./ContactList.styled";
 
-const ContactList = ({ contacts, filteredContacts, deleteContact }) => {
+ const ContactList = ({ contacts, filter, deleteContact }) => {
+  
+  const filteredContacts = () => {
+       if (contacts) {
+      const normalizedFilter = filter.toLowerCase();
+      const getFilteredContacts = contacts.filter(
+        (contact) =>
+          contact.name.toLowerCase().includes(normalizedFilter) ||
+          contact.phone.includes(normalizedFilter)
+      );
+      return getFilteredContacts;
+    }
+  };
+
+  const getFilteredContacts = filteredContacts();
+   
   return (
-    <ContactListStyles >
+    <ContactListStyles>
       {contacts.length === 0 ? (
         <Notification>No contacts added yet</Notification>
       ) : (
         <List>
-          {filteredContacts.length === 0 ? (
+          {getFilteredContacts.length === 0 ? (
             <p>Contact not found</p>
           ) : (
-            filteredContacts.map((contact) => (
-              <ListItem key={contact.id}>
+            getFilteredContacts.map((contact) => (
+              <ContactItem key={contact.id} {...contact}>
                <span>
-               {contact.name}: {contact.number}
+               {contact.name}: {contact.phone}
                  </span> 
               <Button onClick={() => deleteContact(contact.id)}>
-                  delete
+                Delete
                 </Button>
-              </ListItem>
+              </ContactItem>
             ))
           )}
+
+
+          
         </List>
       )}
     </ContactListStyles>
@@ -38,8 +57,8 @@ ContactList.propTypes = {
       phone: PropTypes.string.isRequired,
     })
   ),
-  filteredContacts: PropTypes.string.isRequired,
+  filter: PropTypes.string.isRequired,
   deleteContact: PropTypes.func.isRequired,
 };
 
-export default ContactList;
+export default ContactList ;
